@@ -3,12 +3,22 @@
 <html>
 
 <head>
-    <link rel="stylesheet" , href="button.css">
+    <link rel="stylesheet" , href="popup.css">
 </head>
 
 <body>
-    <span>Need a reminder?</span>
-    <input type="checkbox" id="checkbox"></input>
+    <div id="outer-container">
+        <div>Need a Reminder?</div>
+        <div id="inputs-container">
+            <div id="dt-pickers">
+                <input type="date" class="dt-inputs" />
+                <input type="time" class="dt-inputs" />
+            </div>
+            <button id="set-rmndr-btn">set it!</button><br />
+            <input type="checkbox" id="repeat-chkbx"></input>
+        </div>
+    </div>
+    <!-- <span>Need a reminder?</span> -->
     <script src='popup.js'></script>
 </body>
 
