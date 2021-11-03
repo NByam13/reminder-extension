@@ -8,52 +8,34 @@ chrome.runtime.onInstalled.addListener(() => {
     })
 })
 
-// adds a listener for a message from the popup script saying its monday.
-chrome.runtime.onMessage.addListener((message) => {
-    // check for the message that wants to set an alarm
+// add a listener for browser messages coming from popup.js
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+    let success = false
 
+    // grab the date and time from the request
+    const { date, time } = request
 
+    // create a new date object from the date and time
+    const dtString = `${date} ${time}`
+    const reminderDate = new Date(dtString)
+    const when = reminderDate.getTime()
 
+    // make sure the time is after the current time
+    if (when > Date.now()) {
+        // create alarmInfo config object
+        const alarmInfo = { when: when }
 
-    // if (message.message === 'monday') {
-    //     chrome.tabs.query({ active: true }, (tabs) => {
-    //         console.log('scripting call', tabs[0].id)
-    //         chrome.scripting.executeScript({
-    //             target: { tabId: tabs[0].id },
-    //             function: meetingReminder,
-    //         });
-    //     })
-    //     console.log('monday!')
-    //     return;
-    // }
+        // set a new alarm for the date object
+        chrome.alarms.create('reminder', alarmInfo)
+        success = true
+    }
 
-    // if (message.message === 'update') {
-    //     chrome.storage.sync.set({ checked: message.checked })
-    //     if (!message.checked) {
-    //         chrome.alarms.clear('meetingReminder')
-    //     }
-    // }
+    // send a response to the popup.js that the alarm has been set
+    sendResponse({ success })
 })
 
-// const calcTimeTillMonday = () => {
-//     const diff = ((7 - (new Date()).getDay()) % 7) + 1
-//     let monday = new Date()
-//     monday.setDate(monday.getDay + diff).setHours(9, 30, 0, 0)
-//     return monday.getTime()
-// }
+// create a listener for alarms
+chrome.alarms.onAlarm.addListener((alarm) => {
 
-// function meetingReminder() {
-//     const diff = ((7 - (new Date()).getDay()) % 7) + 1
-//     let monday = new Date()
-//     monday = new Date(monday.setDate(monday.getDay + diff)).setHours(9, 30, 0, 0)
-//     let temp = monday.getTime()
-//     console.log(temp)
-//     let msTillMonday = 100000 + (new Date).now()
-//     const alarmCreateInfo = { when: msTillMonday }
-
-//     // set a chrome alert for the given timeout
-//     chrome.alarms.create('meetingReminder', { ...alarmCreateInfo }, () => {
-//         console.log('alarm created')
-//     })
-// }
+})
 
