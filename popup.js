@@ -3,8 +3,19 @@ const dateIn = document.getElementById('date-input')
 const timeIn = document.getElementById('time-input')
 const setBtn = document.getElementById('set-rmndr-btn')
 
-chrome.storage.sync.get('checked', ({ checked }) => {
+chrome.storage.sync.get('repeat', ({ checked }) => {
     checkbox.checked = checked
+})
+
+// a listener for the messages from background.js that the alarm went off
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log('message received', sender)
+    let success = false;
+    if (message.data === 'alarm') {
+        alert('You set a reminder for this time!')
+        success = true;
+    }
+    sendResponse({ success })
 })
 
 // look for blur event because it's the only way to know when the user has finished selecting the date
@@ -47,8 +58,8 @@ setBtn.addEventListener('click', () => {
                 status = 'Reminder set successfully!'
             }
 
-            chrome.notifications.create('69', { message: status, priority: 2, type: 'basic' }, () => {
-                console.log('notification created')
+            chrome.notifications.create('69', { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started128.png" }, () => {
+                console.log('errors', chrome.runtime.lastError)
             })
         })
     })
