@@ -33,13 +33,12 @@ checkbox.addEventListener('change', (event) => {
 })
 
 setBtn.addEventListener('click', () => {
-    let savedDate = ''
-    let savedTime = ''
+    // make sure the user has selected a date and time first
     if (!dateIn.value || !timeIn.value) return false;
+
+    // fetch results from storage api
     chrome.storage.sync.get(['date', 'time', 'repeat'], ({ date, time, repeat }) => {
-        savedDate = date
-        savedTime = time
-        console.log(savedDate, savedTime, dateIn.value, timeIn.value)
+        //then tell background.js about the new reminder to create, and wait for the response
         chrome.runtime.sendMessage({ date: date, time: time, repeat: repeat }, (response) => {
             console.log('Response Received', response)
         })
