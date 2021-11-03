@@ -40,7 +40,16 @@ setBtn.addEventListener('click', () => {
     chrome.storage.sync.get(['date', 'time', 'repeat'], ({ date, time, repeat }) => {
         //then tell background.js about the new reminder to create, and wait for the response
         chrome.runtime.sendMessage({ date: date, time: time, repeat: repeat }, (response) => {
-            console.log('Response Received', response)
+            // check the response from background.js and create a notification on the outcome.
+            let status = 'Reminder failed to set...'
+
+            if (response.success) {
+                status = 'Reminder set successfully!'
+            }
+
+            chrome.notifications.create('69', { message: status, priority: 2, type: 'basic' }, () => {
+                console.log('notification created')
+            })
         })
     })
 })
