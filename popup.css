@@ -12,6 +12,16 @@ body {
     flex-direction: column;
 }
 
+#controls-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#chkbx-container {
+    display: inline-block;
+}
+
 .dt-inputs {
     max-width: 145px;
 }
