@@ -1,10 +1,17 @@
 // on install of the extension, check to see if checked has been set
 // if it has then do nothing, other wise set it to false
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.storage.sync.get('repeat', (data) => {
-        if (typeof data.checked === 'undefined') {
-            chrome.storage.sync.set({ checked: false })
+    // on install, check to see if there is any existing data which is not needed
+    chrome.storage.sync.get(['date', 'time', 'repeat'], ({ date, time, repeat }) => {
+        if (date || time || repeat) {
+            // remove storage keys if they exist
+            chrome.storage.sync.remove(['date', 'time', 'repeat']);
         }
+
+        // reset storage keys to defaults
+        chrome.storage.sync.set({ date: '' })
+        chrome.storage.sync.set({ time: '' })
+        chrome.storage.sync.set({ repeat: false })
     })
 })
 
@@ -43,10 +50,14 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
         // check if repeat is clicked or not and set the alarm accordingly
         chrome.storage.sync.get('repeat', ({ repeat }) => {
+            console.log('repeat: ' + repeat)
+
             if (repeat) {
-                const reminderDate = new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)) // timezone problem because daylight savings time sucks
+                // re-set the alarm for a time period of 1 minute, TODO: make repeat time configurable
+                const reminderDate = new Date(Date.now() + (60 * 1000)) // adding 1m for testing's sake 
                 const when = reminderDate.getTime()
                 chrome.alarms.create('reminder', { when: when })
+                console.log('alarm set for: ' + reminderDate)
             }
         })
     })
