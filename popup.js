@@ -3,8 +3,8 @@ const dateIn = document.getElementById('date-input')
 const timeIn = document.getElementById('time-input')
 const setBtn = document.getElementById('set-rmndr-btn')
 
-chrome.storage.sync.get('repeat', ({ checked }) => {
-    checkbox.checked = checked
+chrome.storage.sync.get('repeat', ({ repeat }) => {
+    checkbox.checked = repeat
 })
 
 // a listener for the messages from background.js that the alarm went off
@@ -12,6 +12,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('message received', sender)
     let success = false;
     if (message.data === 'alarm') {
+        // TODO: make message configurable
         alert('You set a reminder for this time!')
         success = true;
     }
@@ -27,6 +28,7 @@ dateIn.addEventListener('blur', (event) => {
     })
 })
 
+// look for blur event because it's the only way to know when the user has finished selecting the time
 timeIn.addEventListener('blur', (event) => {
     const time = event.target.value
     console.log(time)
@@ -58,8 +60,8 @@ setBtn.addEventListener('click', () => {
                 status = 'Reminder set successfully!'
             }
 
-            chrome.notifications.create('69', { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started128.png" }, () => {
-                console.log('errors', chrome.runtime.lastError)
+            chrome.notifications.create('set-reminder', { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started128.png" }, () => {
+                console.log('Still not seeing this notification pop up anywhere')
             })
         })
     })
