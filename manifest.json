@@ -1,5 +1,5 @@
 {
-    "name": "Monday Meeting Reminder",
+    "name": "RemindMe!",
     "description": "Displays a pop up so I dont forget about my monday morning meetings anymore",
     "version": "1.0",
     "manifest_version": 3,
