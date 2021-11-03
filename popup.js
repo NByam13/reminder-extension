@@ -1,21 +1,47 @@
-const checkbox = document.getElementById('checkbox')
+const checkbox = document.getElementById('repeat-chkbx')
+const dateIn = document.getElementById('date-input')
+const timeIn = document.getElementById('time-input')
+const setBtn = document.getElementById('set-rmndr-btn')
 
 chrome.storage.sync.get('checked', ({ checked }) => {
     checkbox.checked = checked
 })
 
-checkbox.addEventListener('change', () => {
-    // console.log('checked', checkbox.checked)
+// look for blur event because it's the only way to know when the user has finished selecting the date
+dateIn.addEventListener('blur', (event) => {
+    const date = event.target.value
+    console.log(date)
+    chrome.storage.sync.set({ date }, () => {
+        console.log('date saved')
+    })
+})
 
-    // // send message to update the checked status
-    // chrome.runtime.sendMessage({ message: 'update', checked: checkbox.checked }, () => {
-    //     console.log('update message sent')
-    // })
+timeIn.addEventListener('blur', (event) => {
+    const time = event.target.value
+    console.log(time)
+    chrome.storage.sync.set({ time }, () => {
+        console.log('time saved')
+    })
+})
 
-    // // send message if checked on to set the timeout and calculate time till monday at 935
-    // if (checkbox.checked) {
-    //     chrome.runtime.sendMessage({
-    //         message: 'monday'
-    //     }, () => { console.log('monday message sent') })
-    // }
+checkbox.addEventListener('change', (event) => {
+    const repeat = event.target.checked
+    console.log('repeat', repeat)
+    chrome.storage.sync.set({ repeat: repeat }, () => {
+        console.log('repeat saved')
+    })
+})
+
+setBtn.addEventListener('click', () => {
+    let savedDate = ''
+    let savedTime = ''
+    if (!dateIn.value || !timeIn.value) return false;
+    chrome.storage.sync.get(['date', 'time', 'repeat'], ({ date, time, repeat }) => {
+        savedDate = date
+        savedTime = time
+        console.log(savedDate, savedTime, dateIn.value, timeIn.value)
+        chrome.runtime.sendMessage({ date: date, time: time, repeat: repeat }, (response) => {
+            console.log('Response Received', response)
+        })
+    })
 })
