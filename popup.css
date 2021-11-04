@@ -10,6 +10,7 @@ body {
 #dt-pickers {
     display: flex;
     flex-direction: column;
+    margin-bottom: 5px;
 }
 
 #controls-container {
@@ -20,6 +21,12 @@ body {
 
 #chkbx-container {
     display: inline-block;
+    margin-bottom: 5px;
+}
+
+#msg-box{
+    margin-bottom: 5px;
+    resize: none;
 }
 
 .dt-inputs {

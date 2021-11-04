@@ -2,16 +2,17 @@
 // if it has then do nothing, other wise set it to false
 chrome.runtime.onInstalled.addListener(() => {
     // on install, check to see if there is any existing data which is not needed
-    chrome.storage.sync.get(['date', 'time', 'repeat'], ({ date, time, repeat }) => {
-        if (date || time || repeat) {
+    chrome.storage.sync.get(['date', 'time', 'repeat', 'msg'], ({ date, time, repeat, msg }) => {
+        if (date || time || repeat || msg) {
             // remove storage keys if they exist
-            chrome.storage.sync.remove(['date', 'time', 'repeat']);
+            chrome.storage.sync.remove(['date', 'time', 'repeat', 'msg']);
         }
 
         // reset storage keys to defaults
         chrome.storage.sync.set({ date: '' })
         chrome.storage.sync.set({ time: '' })
         chrome.storage.sync.set({ repeat: false })
+        chrome.storage.sync.set({ msg: '' })
     })
 })
 
@@ -23,10 +24,8 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     const { date, time } = request
 
     // create a new date object from the date and time
-    const dtString = `${date} ${time}`
-    const reminderDate = new Date(dtString)
+    const reminderDate = new Date(`${date} ${time}`)
     const when = reminderDate.getTime()
-
 
     // make sure the time is after the current time
     if (when > Date.now()) {
@@ -43,37 +42,40 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 })
 
 // create a listener for alarms
-chrome.alarms.onAlarm.addListener((alarm) => {
-    // trigger the alert
+chrome.alarms.onAlarm.addListener(() => {
     let status = 'You set a reminder for this time!'
 
-    // add a timestamp so the ids between notifications are unique
-    const timeStamp = Date.now()
+    chrome.storage.sync.get(['msg'], ({ msg }) => {
+        if (msg.length > 0) {
+            status = msg
+        }
 
-    chrome.notifications.create(`reminder-${timeStamp}`,
-        {
-            title: 'Alarm status',
-            message: status,
-            priority: 2,
-            type: 'basic',
-            iconUrl: "/images/get_started48.png"
-        }, () => {
-            console.log('notification created')
-        })
+        chrome.notifications.create(`reminder-${Date.now()}`,
+            {
+                title: 'Reminder!',
+                message: status,
+                priority: 2,
+                type: 'basic',
+                iconUrl: "/images/get_started48.png"
+            }, () => {
+                console.log('notification created')
+            })
+    })
 
     // check if repeat is clicked or not and set the alarm accordingly
-    chrome.storage.sync.get('repeat', ({ repeat }) => {
+    chrome.storage.sync.get(['repeat'], ({ repeat }) => {
         console.log('repeat: ' + repeat)
 
         if (repeat) {
             // re-set the alarm for a time period of 1 minute, TODO: make repeat time configurable
             const reminderDate = new Date(Date.now() + (60 * 1000)) // adding 1m for testing's sake 
             const when = reminderDate.getTime()
+            let repeatMsg = `A reminder was created for ${reminderDate} with message: ${status}`
             chrome.alarms.create('reminder', { when: when })
-            chrome.notifications.create(`repeat-reminder-${timeStamp}`,
+            chrome.notifications.create(`repeat-reminder-${Date.now()}`,
                 {
                     title: 'Reminder Created',
-                    message: status,
+                    message: repeatMsg,
                     priority: 2,
                     type: 'basic',
                     iconUrl: "/images/get_started48.png"

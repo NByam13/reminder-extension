@@ -2,15 +2,16 @@ const checkbox = document.getElementById('repeat-chkbx')
 const dateIn = document.getElementById('date-input')
 const timeIn = document.getElementById('time-input')
 const setBtn = document.getElementById('set-rmndr-btn')
+const msgBox = document.getElementById('msg-box')
 
-chrome.storage.sync.get('repeat', ({ repeat }) => {
+// grab the stored value for repeat, let the other values reset when popup is closed
+chrome.storage.sync.get(['repeat'], ({ repeat }) => {
     checkbox.checked = repeat
 })
 
 // look for blur event because it's the only way to know when the user has finished selecting the date
 dateIn.addEventListener('blur', (event) => {
     const date = event.target.value
-    console.log(date)
     chrome.storage.sync.set({ date }, () => {
         console.log('date saved')
     })
@@ -19,7 +20,6 @@ dateIn.addEventListener('blur', (event) => {
 // look for blur event because it's the only way to know when the user has finished selecting the time
 timeIn.addEventListener('blur', (event) => {
     const time = event.target.value
-    console.log(time)
     chrome.storage.sync.set({ time }, () => {
         console.log('time saved')
     })
@@ -27,24 +27,65 @@ timeIn.addEventListener('blur', (event) => {
 
 checkbox.addEventListener('change', (event) => {
     const repeat = event.target.checked
-    console.log('repeat', repeat)
-    chrome.storage.sync.set({ repeat: repeat }, () => {
+    chrome.storage.sync.set({ repeat }, () => {
         console.log('repeat saved')
+    })
+})
+
+// listen for blur event so we know when text area loses focus
+msgBox.addEventListener('blur', (event) => {
+    const msg = event.target.value
+    chrome.storage.sync.set({ msg }, () => {
+        console.log('msg saved')
     })
 })
 
 setBtn.addEventListener('click', () => {
     // make sure the user has selected a date and time first
-    if (!dateIn.value || !timeIn.value) return false;
+
+    if (!dateIn.value || !timeIn.value) {
+        chrome.notifications.create(`reminder-failed-${Date.now()}`,
+            {
+                title: 'Reminder Failed',
+                message: "Please enter a date and time first to set a reminder",
+                priority: 2,
+                type: 'basic',
+                iconUrl: "/images/get_started48.png"
+            }, () => {
+                console.log('notification failed')
+            })
+        return false;
+    }
+
+    // make sure reminder date and time is in the future
+    const date = new Date(`${dateIn.value} ${timeIn.value}`)
+
+    if (date.getTime() < Date.now()) {
+        chrome.notifications.create(`reminder-failed-${Date.now()}`,
+            {
+                title: 'Reminder Failed',
+                message: "I can't remind you in the past... yet.",
+                priority: 2,
+                type: 'basic',
+                iconUrl: "/images/get_started48.png"
+            }, () => {
+                console.log('notification failed')
+            })
+        return false
+    }
 
     // fetch results from storage api
-    chrome.storage.sync.get(['date', 'time', 'repeat'], ({ date, time, repeat }) => {
+    chrome.storage.sync.get(['date', 'time', 'repeat', 'msg'], ({ date, time, repeat, msg }) => {
         //then tell background.js about the new reminder to create, and wait for the response
-        chrome.runtime.sendMessage({ date: date, time: time, repeat: repeat }, (response) => {
+        chrome.runtime.sendMessage({ date, time, repeat, msg }, () => {
             // check the response from background.js and create a notification on the outcome.
-            const timeStamp = Date.now()
-            const status = `An reminder has been created for ${date} ${time}`
-            chrome.notifications.create(`reminder-created-${timeStamp}`,
+            let status = `A reminder has been created for ${date} ${time}`
+
+            if (msg.length > 0) {
+                status += ` with message: ${msg}`
+            }
+
+            chrome.notifications.create(`reminder-created-${Date.now()}`,
                 {
                     title: 'Reminder Created',
                     message: status,
