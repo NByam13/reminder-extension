@@ -47,7 +47,10 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     // trigger the alert
     let status = 'You set a reminder for this time!'
 
-    chrome.notifications.create('set-reminder', { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started128.png" }, () => {
+    // add a timestamp so the ids between notifications are unique
+    const timeStamp = Date.now()
+
+    chrome.notifications.create(`reminder-${timeStamp}`, { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started48.png" }, () => {
         console.log('notification created')
     })
 
@@ -60,7 +63,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
             const reminderDate = new Date(Date.now() + (60 * 1000)) // adding 1m for testing's sake 
             const when = reminderDate.getTime()
             chrome.alarms.create('reminder', { when: when })
-            console.log('alarm set for: ' + reminderDate)
+            chrome.notifications.create(`repeat-reminder-${timeStamp}`, { title: 'Reminder Created', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started48.png" }, () => {
+                console.log('notification created')
+            })
         }
     })
 })

@@ -42,7 +42,11 @@ setBtn.addEventListener('click', () => {
         //then tell background.js about the new reminder to create, and wait for the response
         chrome.runtime.sendMessage({ date: date, time: time, repeat: repeat }, (response) => {
             // check the response from background.js and create a notification on the outcome.
-            console.log(response)
+            const timeStamp = Date.now()
+            const status = `An reminder has been created for ${date} ${time}`
+            chrome.notifications.create(`reminder-created-${timeStamp}`, { title: 'Reminder Created', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started48.png" }, () => {
+                console.log('notification created')
+            })
         })
     })
 })
