@@ -44,22 +44,25 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
 
 // create a listener for alarms
 chrome.alarms.onAlarm.addListener((alarm) => {
-    // send a message to popup.js that the alarm went off
-    chrome.runtime.sendMessage({ data: 'alarm' }, (response) => {
-        console.log('alarm status:' + response.success)
+    // trigger the alert
+    let status = 'You set a reminder for this time!'
 
-        // check if repeat is clicked or not and set the alarm accordingly
-        chrome.storage.sync.get('repeat', ({ repeat }) => {
-            console.log('repeat: ' + repeat)
+    chrome.notifications.create('set-reminder', { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started128.png" }, () => {
+        console.log('notification created')
+    })
 
-            if (repeat) {
-                // re-set the alarm for a time period of 1 minute, TODO: make repeat time configurable
-                const reminderDate = new Date(Date.now() + (60 * 1000)) // adding 1m for testing's sake 
-                const when = reminderDate.getTime()
-                chrome.alarms.create('reminder', { when: when })
-                console.log('alarm set for: ' + reminderDate)
-            }
-        })
+    // check if repeat is clicked or not and set the alarm accordingly
+    chrome.storage.sync.get('repeat', ({ repeat }) => {
+        console.log('repeat: ' + repeat)
+
+        if (repeat) {
+            // re-set the alarm for a time period of 1 minute, TODO: make repeat time configurable
+            const reminderDate = new Date(Date.now() + (60 * 1000)) // adding 1m for testing's sake 
+            const when = reminderDate.getTime()
+            chrome.alarms.create('reminder', { when: when })
+            console.log('alarm set for: ' + reminderDate)
+        }
     })
 })
+
 
