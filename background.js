@@ -50,9 +50,16 @@ chrome.alarms.onAlarm.addListener((alarm) => {
     // add a timestamp so the ids between notifications are unique
     const timeStamp = Date.now()
 
-    chrome.notifications.create(`reminder-${timeStamp}`, { title: 'Alarm status', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started48.png" }, () => {
-        console.log('notification created')
-    })
+    chrome.notifications.create(`reminder-${timeStamp}`,
+        {
+            title: 'Alarm status',
+            message: status,
+            priority: 2,
+            type: 'basic',
+            iconUrl: "/images/get_started48.png"
+        }, () => {
+            console.log('notification created')
+        })
 
     // check if repeat is clicked or not and set the alarm accordingly
     chrome.storage.sync.get('repeat', ({ repeat }) => {
@@ -63,9 +70,16 @@ chrome.alarms.onAlarm.addListener((alarm) => {
             const reminderDate = new Date(Date.now() + (60 * 1000)) // adding 1m for testing's sake 
             const when = reminderDate.getTime()
             chrome.alarms.create('reminder', { when: when })
-            chrome.notifications.create(`repeat-reminder-${timeStamp}`, { title: 'Reminder Created', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started48.png" }, () => {
-                console.log('notification created')
-            })
+            chrome.notifications.create(`repeat-reminder-${timeStamp}`,
+                {
+                    title: 'Reminder Created',
+                    message: status,
+                    priority: 2,
+                    type: 'basic',
+                    iconUrl: "/images/get_started48.png"
+                }, () => {
+                    console.log('notification created')
+                })
         }
     })
 })

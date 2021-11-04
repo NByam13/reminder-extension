@@ -44,9 +44,16 @@ setBtn.addEventListener('click', () => {
             // check the response from background.js and create a notification on the outcome.
             const timeStamp = Date.now()
             const status = `An reminder has been created for ${date} ${time}`
-            chrome.notifications.create(`reminder-created-${timeStamp}`, { title: 'Reminder Created', message: status, priority: 2, type: 'basic', iconUrl: "/images/get_started48.png" }, () => {
-                console.log('notification created')
-            })
+            chrome.notifications.create(`reminder-created-${timeStamp}`,
+                {
+                    title: 'Reminder Created',
+                    message: status,
+                    priority: 2,
+                    type: 'basic',
+                    iconUrl: "/images/get_started48.png"
+                }, () => {
+                    console.log('notification created')
+                })
         })
     })
 })
