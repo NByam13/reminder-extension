@@ -1,34 +1,42 @@
 body {
-    width: 150px;
+  width: 150px;
 }
 
 #outer-container {
-    margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 #dt-pickers {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
 }
 
 #controls-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 #chkbx-container {
-    display: inline-block;
-    margin-bottom: 5px;
+  display: inline-block;
+  margin-bottom: 5px;
 }
 
-#msg-box{
-    margin-bottom: 5px;
-    resize: none;
+#msg-box {
+  margin-bottom: 5px;
+  resize: none;
 }
 
 .dt-inputs {
-    max-width: 145px;
+  max-width: 145px;
+}
+
+#alarm-list-title {
+  font-weight: bold;
+}
+
+#alarm-list ul {
+  padding-left: 0;
 }
