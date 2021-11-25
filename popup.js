@@ -4,6 +4,7 @@ const timeIn = document.getElementById("time-input");
 const setBtn = document.getElementById("set-rmndr-btn");
 const msgBox = document.getElementById("msg-box");
 
+// fetch alarm list and update on UI when extension loads
 window.onload = function () {
   updateAlarmList();
 };
@@ -14,9 +15,7 @@ const updateAlarmList = () => {
     alarms
       .sort((first, second) => first.scheduledTime - second.scheduledTime)
       .forEach((element) => {
-        alarmList += `<li>${new Date(
-          element.scheduledTime
-        ).toLocaleString()}</li>`;
+        alarmList += `<li>${new Date(element.scheduledTime).toLocaleString()}</li>`;
       });
     alarmList += "</ul>";
 
